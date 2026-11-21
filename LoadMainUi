@@ -1,0 +1,149 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("HyperZ_UI") then
+	PlayerGui.HyperZ_UI:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HyperZ_UI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 480, 0, 340)
+Main.Position = UDim2.new(0.5, -240, 0.5, -170)
+Main.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+Main.BorderSizePixel = 0
+Main.Visible = true
+Main.Parent = ScreenGui
+
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+local Gradient = Instance.new("UIGradient")
+Gradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(140, 0, 255)),
+	ColorSequenceKeypoint.new(0.45, Color3.fromRGB(60, 0, 120)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(15, 15, 20))
+})
+Gradient.Rotation = 125
+Gradient.Parent = Main
+
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 36)
+TitleBar.BackgroundTransparency = 1
+TitleBar.Parent = Main
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -50, 1, 0)
+Title.Position = UDim2.new(0, 14, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "HyperZ UI"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = TitleBar
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position = UDim2.new(1, -34, 0, 4)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+CloseBtn.Text = "×"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 18
+CloseBtn.Parent = TitleBar
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+local TabContainer = Instance.new("Frame")
+TabContainer.Name = "TabContainer"
+TabContainer.Size = UDim2.new(0, 120, 1, -46)
+TabContainer.Position = UDim2.new(0, 8, 0, 40)
+TabContainer.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+TabContainer.BorderSizePixel = 0
+TabContainer.Parent = Main
+Instance.new("UICorner", TabContainer).CornerRadius = UDim.new(0, 8)
+
+local ContentArea = Instance.new("Frame")
+ContentArea.Name = "ContentArea"
+ContentArea.Size = UDim2.new(1, -140, 1, -46)
+ContentArea.Position = UDim2.new(0, 134, 0, 40)
+ContentArea.BackgroundTransparency = 1
+ContentArea.Parent = Main
+
+local Credit = Instance.new("TextLabel")
+Credit.Size = UDim2.new(0, 120, 0, 18)
+Credit.Position = UDim2.new(0, 8, 1, -24)
+Credit.BackgroundTransparency = 1
+Credit.Text = "by HyperZscript"
+Credit.TextColor3 = Color3.fromRGB(160, 100, 255)
+Credit.Font = Enum.Font.Gotham
+Credit.TextSize = 11
+Credit.Parent = Main
+
+local OpenBtn = Instance.new("TextButton")
+OpenBtn.Name = "OpenBtn"
+OpenBtn.Size = UDim2.new(0, 50, 0, 50)
+OpenBtn.Position = UDim2.new(0, 20, 0, 20)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+OpenBtn.Text = "OPEN"
+OpenBtn.TextColor3 = Color3.fromRGB(180, 80, 255)
+OpenBtn.Font = Enum.Font.GothamBold
+OpenBtn.TextSize = 12
+OpenBtn.Visible = false
+OpenBtn.Parent = ScreenGui
+Instance.new("UICorner", OpenBtn).CornerRadius = UDim.new(0, 10)
+
+local OpenGradient = Instance.new("UIGradient")
+OpenGradient.Color = ColorSequence.new({
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(140, 0, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 10, 40))
+})
+OpenGradient.Parent = OpenBtn
+
+local function CloseUI()
+	Main.Visible = false
+	OpenBtn.Visible = true
+end
+
+local function OpenUI()
+	Main.Visible = true
+	OpenBtn.Visible = false
+end
+
+CloseBtn.MouseButton1Click:Connect(CloseUI)
+OpenBtn.MouseButton1Click:Connect(OpenUI)
+
+local function MakeDraggable(frame, handle)
+	handle = handle or frame
+	local dragging, dragStart, startPos
+
+	handle.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+		end
+	end)
+
+	handle.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
+end
+
+MakeDraggable(Main, TitleBar)
+MakeDraggable(OpenBtn)
